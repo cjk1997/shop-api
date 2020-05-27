@@ -82,8 +82,32 @@ const updateQuantity = (id, newQuantity) => {
     return iou;
 };
 
+const deleteInventoryItem = (id) => {
+    const iou = new Promise((resolve, reject) => {
+        MongoClient.connect(url, settings, function(err, client) {
+            if (err) {
+                reject(err);
+            } else {
+                console.log("Connect to server to delete inventory item.");
+                const db = client.db(dbName);
+                const collection = db.collection(inventoryCol);
+                collection.deleteOne({ _id : ObjectID(id) }, function(err, result) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve({ deletedID: id });
+                        client.close();
+                    };
+                });
+            };
+        });
+    });
+    return iou;
+};
+
 module.exports = {
     getInventory,
     updateInventoryItem,
     updateQuantity,
+    deleteInventoryItem
 };
