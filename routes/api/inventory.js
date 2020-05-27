@@ -4,6 +4,7 @@ const {
     getInventory,
     updateInventoryItem,
     updateQuantity,
+    deleteInventoryItem
 } = require('../../data/inventory');
 
 Router.get('/', async function(req, res, next) {
@@ -29,6 +30,16 @@ Router.put('/:id', async function(req, res, next) {
 Router.patch('/quantity/:id', async function(req, res, next) {
     try {
         const data = await updateQuantity(req.params.id, req.body);
+        res.send(data);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Internal server issues, check logs.");
+    };
+});
+
+Router.delete('/:id', async function(req, res, next) {
+    try {
+        const data = await deleteInventoryItem(req.params.id);
         res.send(data);
     } catch (err) {
         console.log(err);
