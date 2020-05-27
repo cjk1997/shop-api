@@ -2,6 +2,7 @@ const express = require('express');
 const Router = express.Router();
 const {
     getInventory,
+    addInventoryItem,
     updateInventoryItem,
     updateQuantity,
     deleteInventoryItem
@@ -17,6 +18,16 @@ Router.get('/', async function(req, res, next) {
     };
 });
 
+Router.post('/', async function(req, res, next) {
+    try {
+        const data = await addInventoryItem();
+        res.send(data);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Internal server issues, check logs.");
+    };
+});
+
 Router.put('/:id', async function(req, res, next) {
     try {
         const data = await updateInventoryItem(req.params.id, req.body);
@@ -24,8 +35,8 @@ Router.put('/:id', async function(req, res, next) {
     } catch (err) {
         console.log(err);
         res.status(500).send("Internal server issues, check logs.")
-    }
-})
+    };
+});
 
 Router.patch('/quantity/:id', async function(req, res, next) {
     try {
