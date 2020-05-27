@@ -31,6 +31,29 @@ const getInventory = () => {
     return iou;
 };
 
+const addInventoryItem = (inventoryItem) => {
+    const iou = new Promise((resolve, reject) => {
+        MongoClient.connect(url, settings, function(err, client) {
+            if (err) {
+                reject(err);
+            } else {
+                console.log("Connected to server to add inventory item.");
+                const db = client.db(dbName);
+                const collection = db.collection(inventoryCol);
+                collection.insertOne(inventoryItem, function(err, result) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(result.ops[0]);
+                        client.close();
+                    };
+                });
+            };
+        });
+    });
+    return iou;
+};
+
 const updateInventoryItem = (id, inventoryItem) => {
     const iou = new Promise((resolve, reject) => {
         MongoClient.connect(url, settings, function(err, client) {
@@ -107,6 +130,7 @@ const deleteInventoryItem = (id) => {
 
 module.exports = {
     getInventory,
+    addInventoryItem,
     updateInventoryItem,
     updateQuantity,
     deleteInventoryItem
