@@ -17,7 +17,7 @@ const getUserByValue = (key, value) => {
                 console.log("Connected to server to get user.");
                 const db = client.db(dbName);
                 const collection = db.collection(usersCol);
-                collection.find({ [key]: value }).toArray(function (err, result) {
+                collection.find({ [key]: value }).toArray(function(err, result) {
                     if (err) {
                         reject(err);
                     } else {
