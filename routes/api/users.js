@@ -32,7 +32,10 @@ Router.post('/login', async function(req, res) {
                         { algorithm: 'HS512' },
                         function(err, token) {
                             if (err) throw(err);
+                            console.log(body.email, token);
                             res.set('authentication', token);
+                            res.set('Access-Control-Expose-Headers', 'authentication, admin');
+                            if (body.email === 'admin') res.set('admin', body.email);
                             res.send();
                         }
                     );
