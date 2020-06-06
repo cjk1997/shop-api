@@ -14,13 +14,37 @@ const getInventory = () => {
             if (err) {
                 reject(err);
             } else {
-                console.log("Connected to server to retreive inventory.");
+                console.log("Connected to server to retrieve inventory.");
                 const db = client.db(dbName);
                 const collection = db.collection(inventoryCol);
                 collection.find({}).toArray(function(err, result) {
                     if (err) {
                         reject(err);
                     } else {
+                        resolve(result);
+                        client.close();
+                    };
+                });
+            };
+        });
+    });
+    return iou;
+};
+
+const getItem = (id) => {
+    const iou = new Promise((resolve, reject) => {
+        MongoClient.connect(url, settings, function(err, client) {
+            if (err) {
+                reject(err);
+            } else {
+                console.log("Connected to server to retrieve item.");
+                const db = client.db(dbName);
+                const collection = db.collection(inventoryCol);
+                collection.find(ObjectID(id)).toArray(function(err, result) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        console.log(result);
                         resolve(result);
                         client.close();
                     };
@@ -130,6 +154,7 @@ const deleteInventoryItem = (id) => {
 
 module.exports = {
     getInventory,
+    getItem,
     addInventoryItem,
     updateInventoryItem,
     updateQuantity,
