@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken');
 const { 
     getUserByValue,
     registerUser,
+    updateWishlist,
+    updateCart,
 } = require('../../data/users');
 
 const salt = process.env.SALT;
@@ -34,8 +36,11 @@ Router.post('/login', async function(req, res) {
                             if (err) throw(err);
                             console.log(body.email, token);
                             res.set('authentication', token);
-                            res.set('Access-Control-Expose-Headers', 'authentication, admin');
-                            if (body.email === 'admin') res.set('admin', body.email);
+                            delete user[0]._id;
+                            delete user[0].password;
+                            res.set('user', JSON.stringify(user[0]));
+                            res.set('Access-Control-Expose-Headers', 'authentication, admin, user');
+                            if (body.email === 'admin@admin.com') res.set('admin', 'admin');
                             res.send();
                         }
                     );
@@ -58,10 +63,43 @@ Router.post('/register', function(req, res) {
             bcrypt.hash(plaintextPassword, salt, async function(err, hash) {
                 if (err) throw(err);
                 body.password = hash;
-                const data = await registerUser(req.body);
-                res.send(data);
+                const user = await registerUser(req.body);
+                console.log("user in Register", user)
+                jwt.sign({ _id: user._id },
+                    privateKey,
+                    { algorithm: 'HS512' },
+                    function(err, token) {
+                        if (err) throw(err);
+                        console.log(body.email, token);
+                        res.set('authentication', token);
+                        delete user.password;
+                        res.set('user', JSON.stringify(user));
+                        res.set('Access-Control-Expose-Headers', 'authentication, admin, user');
+                        res.send();
+                    }
+                );
             });
         });
+    } catch {
+        console.log(err);
+        res.status(500).send("Internal server issues, check logs.");
+    };
+});
+
+Router.patch('/wishlist/:id', async function(req, res) {
+    try {
+        const data = await updateWishlist(req.params.id, req.body);
+        res.send(data);
+    } catch {
+        console.log(err);
+        res.status(500).send("Internal server issues, check logs.");
+    };
+});
+
+Router.patch('/cart/:id/', async function(req, res) {
+    try {
+        const data = await updateCart(req.params.id, req.body);
+        res.send(data);
     } catch {
         console.log(err);
         res.status(500).send("Internal server issues, check logs.");
