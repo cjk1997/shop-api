@@ -54,7 +54,59 @@ const registerUser = (user) => {
     return iou;
 };
 
+const updateWishlist = (id, wishlistItems) => {
+    const iou = new Promise((resolve, reject) => {
+        MongoClient.connect(url, settings, function(err, client) {
+            if (err) {
+                reject(err);
+            } else {
+                console.log("Connected to server to update cart.")
+                const db = client.db(dbName);
+                const collection = db.collection(usersCol);
+                collection.updateOne({ _id : ObjectID(id)}, 
+                { $set: { wishlist : wishlistItems } },
+                function(err, result) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(result);
+                        client.close();
+                    };
+                });
+            };
+        });
+    });
+    return iou;
+};
+
+const updateCart = (id, cartItems) => {
+    const iou = new Promise((resolve, reject) => {
+        MongoClient.connect(url, settings, function(err, client) {
+            if (err) {
+                reject(err);
+            } else {
+                console.log("Connected to server to update cart.")
+                const db = client.db(dbName);
+                const collection = db.collection(usersCol);
+                collection.updateOne({ _id : ObjectID(id)}, 
+                { $set: { cart : cartItems } },
+                function(err, result) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(result);
+                        client.close();
+                    };
+                });
+            };
+        });
+    });
+    return iou;
+};
+
 module.exports = {
     getUserByValue,
     registerUser,
+    updateWishlist,
+    updateCart,
 };
