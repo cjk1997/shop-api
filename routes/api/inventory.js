@@ -48,7 +48,7 @@ Router.put('/:id', async function(req, res, next) {
         res.send(data);
     } catch (err) {
         console.log(err);
-        res.status(500).send("Internal server issues, check logs.")
+        res.status(500).send("Internal server issues, check logs.");
     };
 });
 
