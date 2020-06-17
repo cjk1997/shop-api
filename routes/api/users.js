@@ -5,7 +5,9 @@ const jwt = require('jsonwebtoken');
 const { 
     getUserByValue,
     registerUser,
+    getWishlist,
     updateWishlist,
+    getCart,
     updateCart,
 } = require('../../data/users');
 
@@ -36,12 +38,13 @@ Router.post('/login', async function(req, res) {
                             if (err) throw(err);
                             console.log(body.email, token);
                             res.set('authentication', token);
-                            delete user[0]._id;
                             delete user[0].password;
-                            res.set('user', JSON.stringify(user[0]));
+                            // console.log("user[0]", user[0])
+                            // res.set('user', JSON.stringify(user[0]));
+                            console.log("user[0]", user[0])
                             res.set('Access-Control-Expose-Headers', 'authentication, admin, user');
                             if (body.email === 'admin@admin.com') res.set('admin', 'admin');
-                            res.send();
+                            res.send(user[0]);
                         }
                     );
                 };
@@ -73,9 +76,8 @@ Router.post('/register', function(req, res) {
                         console.log(body.email, token);
                         res.set('authentication', token);
                         delete user.password;
-                        res.set('user', JSON.stringify(user));
                         res.set('Access-Control-Expose-Headers', 'authentication, admin, user');
-                        res.send();
+                        res.send(user);
                     }
                 );
             });
@@ -86,7 +88,20 @@ Router.post('/register', function(req, res) {
     };
 });
 
-Router.patch('/wishlist/:id', async function(req, res) {
+Router.get('/wishlist/:id', async function(req, res) {
+    try {
+        const data = await getWishlist(req.params.id);
+        if (data[0].cart) {
+            const userWishlist = data[0].wishlist;
+            res.send(userWishlist);
+        };
+    } catch {
+        console.log(err);
+        res.status(500).send("Internal server issues, check logs.");
+    };
+});
+
+Router.patch('/wishlist/update/:id', async function(req, res) {
     try {
         const data = await updateWishlist(req.params.id, req.body);
         res.send(data);
@@ -96,9 +111,23 @@ Router.patch('/wishlist/:id', async function(req, res) {
     };
 });
 
-Router.patch('/cart/:id/', async function(req, res) {
+Router.get('/cart/:id', async function(req, res) {
+    try {
+        const data = await getCart(req.params.id);
+        if (data[0].cart) {
+            const userCart = data[0].cart;
+            res.send(userCart);
+        };
+    } catch {
+        console.log(err);
+        res.status(500).send("Internal server issues, check logs.");
+    };
+});
+
+Router.patch('/cart/update/:id', async function(req, res) {
     try {
         const data = await updateCart(req.params.id, req.body);
+        // console.log("data inside cart router", data)
         res.send(data);
     } catch {
         console.log(err);
