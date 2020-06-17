@@ -94,7 +94,7 @@ const updateInventoryItem = (id, inventoryItem) => {
                     if (err) {
                         reject(err);
                     } else {
-                        resolve({ updatedID: _id });
+                        resolve({ updatedID: id });
                         client.close();
                     };
                 });
