@@ -54,18 +54,63 @@ const registerUser = (user) => {
     return iou;
 };
 
+const getWishlist = (id) => {
+    const iou = new Promise((resolve, reject) => {
+        MongoClient.connect(url, settings, function(err, client) {
+            if (err) {
+                reject(err);
+            } else {
+                console.log("Connected to server to get wishlist.");
+                const db = client.db(dbName);
+                const collection = db.collection(usersCol);
+                collection.find({ _id: ObjectID(id) }).toArray(function(err, result) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(result);
+                        client.close();
+                    };
+                });
+            };
+        });
+    });
+    return iou;
+};
+
 const updateWishlist = (id, wishlistItems) => {
     const iou = new Promise((resolve, reject) => {
         MongoClient.connect(url, settings, function(err, client) {
             if (err) {
                 reject(err);
             } else {
-                console.log("Connected to server to update cart.")
+                console.log("Connected to server to update wishlist.")
                 const db = client.db(dbName);
                 const collection = db.collection(usersCol);
                 collection.updateOne({ _id : ObjectID(id)}, 
-                { $set: { wishlist : wishlistItems } },
+                { $set: { wishlist: wishlistItems } },
                 function(err, result) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(result);
+                        client.close();
+                    };
+                });
+            };
+        });
+    });
+    return iou;
+};
+
+const getCart = (id) => {
+    const iou = new Promise((resolve, reject) => {
+        MongoClient.connect(url, settings, function(err, client) {
+            if (err) {
+                reject(err);
+            } else {
+                const db = client.db(dbName);
+                const collection = db.collection(usersCol);
+                collection.find({ _id: ObjectID(id) }).toArray(function(err, result) {
                     if (err) {
                         reject(err);
                     } else {
@@ -107,6 +152,8 @@ const updateCart = (id, cartItems) => {
 module.exports = {
     getUserByValue,
     registerUser,
+    getWishlist,
     updateWishlist,
+    getCart,
     updateCart,
 };
